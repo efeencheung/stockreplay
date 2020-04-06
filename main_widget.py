@@ -1,5 +1,7 @@
+from PySide2.QtCore import Qt
 from PySide2.QtGui import QColor, QPalette
-from PySide2.QtWidgets import (QHBoxLayout, QLabel, QPushButton, QSizePolicy,QVBoxLayout, QWidget)
+from PySide2.QtWidgets import QHBoxLayout, QLabel, QPushButton, QSizePolicy, \
+    QVBoxLayout, QWidget
 
 
 class MainWidget(QWidget):
@@ -12,25 +14,33 @@ class MainWidget(QWidget):
         palette.setColor(QPalette.Foreground, QColor(226, 226, 226))
 
         self.title = QLabel("掌趣科技")
-        self.second_btn = QPushButton("分时", self)
-        self.second_btn.setAutoFillBackground(True)
         self.tick_btn = QPushButton("逐笔", self)
+        self.tick_btn.setFixedSize(32, 16)
+        self.second_btn = QPushButton("分时", self)
+        self.second_btn.setFixedSize(32, 16)
         self.k_btn = QPushButton("K线", self)
-        self.k5m_btn = QPushButton("5分钟", self)
+        self.k_btn.setFixedSize(32, 16)
         self.top = QWidget(self)
+        self.top.setObjectName("top")
         self.top_layout = QHBoxLayout()
-        self.top_layout.setMargin(8)
+        self.top_layout.setSpacing(8)
+        self.top_layout.setMargin(0)
+        self.top_layout.setAlignment(Qt.AlignLeft)
         self.top.setLayout(self.top_layout)
-        self.top.setStyleSheet("QPushButton{background:rgb(29, 29, 29)}")
+        self.top.setStyleSheet("\
+            QWidget#top{background:rgba(255,255,255,0.05)}\
+            QPushButton{background:rgba(255,255,255,0.16);border:0}\
+            QPushButton:pressed{background:rgba(255,255,255,0.16)}")
         self.top_layout.addWidget(self.title)
         self.top_layout.addWidget(self.second_btn)
         self.top_layout.addWidget(self.tick_btn)
         self.top_layout.addWidget(self.k_btn)
-        self.top_layout.addWidget(self.k5m_btn)
+        print(self.top.objectName())
 
         top_size = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         self.top.setSizePolicy(top_size)
-        self.top.setFixedHeight(40)
+        self.top.setContentsMargins(8, 0, 8, 0)
+        self.top.setFixedHeight(24)
 
         self.content = QWidget()
 
