@@ -1,6 +1,6 @@
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QColor, QPalette
-from PySide2.QtWidgets import QGraphicsScene, QGraphicsView, QHBoxLayout, QLabel,\
+from PySide2.QtWidgets import QGraphicsLineItem, QGraphicsScene, QGraphicsView, QHBoxLayout, QLabel,\
     QPushButton, QSizePolicy, QVBoxLayout, QWidget
 
 
@@ -42,13 +42,14 @@ class MainWidget(QWidget):
         self.top.setFixedHeight(24)
 
         self.market_scene = QGraphicsScene()
-        self.market_scene.addLine(0,0,500,100)
+        self.line = QGraphicsLineItem(0, 0, 500, 200)
+        #self.line.mapToScene(0, 0, 100, 100)
+        self.market_scene.addItem(self.line)
         self.market = QGraphicsView(self.market_scene)
         self.market.setObjectName("market")
         self.market.setStyleSheet("\
             QWidget#market{background:rgba(255,255,255,0.45)}")
         #aa = self.market(self.market.viewport().geometry()).boundingRect()
-        print(self.market.mapToScene(self.market.rect()).boundingRect())
 
         self.main_layout = QVBoxLayout()
         self.main_layout.setMargin(0)
@@ -60,3 +61,7 @@ class MainWidget(QWidget):
         self.setAutoFillBackground(True)
         size = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         self.setSizePolicy(size)
+
+    def resizeEvent(self, event):
+        self.market_scene.setSceneRect(0, 0, self.market.width(), self.market.height())
+        print(self.market.size())
