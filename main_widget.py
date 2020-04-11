@@ -1,3 +1,6 @@
+import pandas as pd
+import sqlite3
+
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QColor, QPalette, QPainter, QPen
 from PySide2.QtWidgets import QGraphicsLineItem, QGraphicsScene, QGraphicsView, QHBoxLayout, \
@@ -42,6 +45,13 @@ class MainWidget(QWidget):
         self.top.setFixedHeight(24)
 
         self.market_scene = QGraphicsScene()
+        conn = sqlite3.connect('stock.db')        
+        origin_df = pd.read_sql_query("SELECT datetime(time, 'unixepoch', 'localtime') time,\
+            price, volume, type FROM sz_300315", conn, index_col='time')
+        origin_df.index = pd.to_datetime(origin_df.index)
+        price = origin_df["price"].resample('60S', label='right').last()
+        volume = origin_df["volume"].resample('60S', label='right').sum()
+        print(pd.concat([price, volume], axis=1))
         pen = QPen(QColor(187, 134, 252))
         self.market_scene.addLine(0, 188, 20, 168, pen)
         self.market_scene.addLine(21, 168, 40, 198, pen)
