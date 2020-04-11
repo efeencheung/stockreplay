@@ -1,9 +1,10 @@
 import pandas as pd
 import sqlite3
 
+from datetime import datetime
 from PySide2.QtCore import Qt
-from PySide2.QtGui import QColor, QPalette, QPainter, QPen
-from PySide2.QtWidgets import QGraphicsLineItem, QGraphicsScene, QGraphicsView, QHBoxLayout, \
+from PySide2.QtGui import QBrush, QColor, QPalette, QPainter, QPainterPath, QPixmap, QPen
+from PySide2.QtWidgets import QGraphicsLineItem, QGraphicsRectItem, QGraphicsScene, QGraphicsView, QHBoxLayout, \
     QLabel, QPushButton, QSizePolicy, QVBoxLayout, QWidget
 
 
@@ -46,22 +47,29 @@ class MainWidget(QWidget):
 
         self.market_scene = QGraphicsScene()
         conn = sqlite3.connect('stock.db')        
-        origin_df = pd.read_sql_query("SELECT datetime(time, 'unixepoch', 'localtime') time,\
-            price, volume, type FROM sz_300315", conn, index_col='time')
+        origin_df = pd.read_sql_query("SELECT datetime(time, 'unixepoch', 'localtime') time_index,\
+            time, price, volume FROM sz_300315", conn, index_col='time_index')
         origin_df.index = pd.to_datetime(origin_df.index)
+        time = origin_df["time"].resample('60S', label='right').last()
         price = origin_df["price"].resample('60S', label='right').last()
         volume = origin_df["volume"].resample('60S', label='right').sum()
-        print(pd.concat([price, volume], axis=1))
-        pen = QPen(QColor(187, 134, 252))
-        self.market_scene.addLine(0, 188, 20, 168, pen)
-        self.market_scene.addLine(21, 168, 40, 198, pen)
-        self.market_scene.addLine(41, 198, 60, 158, pen)
-        self.market_scene.addLine(61, 158, 80, 188, pen)
-        self.market_scene.addLine(81, 188, 100, 198, pen)
-        #self.line.mapToScene(0, 0, 100, 100)
+        self.df = pd.concat([price, time, volume], axis=1).fillna(method='ffill')
+        max_price = self.df["price"].max()
+        min_price = self.df["price"].min()
+        prev_price = 5.39
+        if abs(max_price - prev_price) > abs(min_price - prev_price):
+            self.max_y = prev_price + abs(max_price - prev_price)
+            self.min_y = prev_price - abs(max_price - prev_price)
+        else:
+            self.max_y = prev_price + abs(min_price - prev_price)
+            self.min_y = prev_price - abs(min_price - prev_price)
+        self.diff_x = 14400
+        self.diff_y = self.max_y - self.min_y
+        self.min_x = datetime(2020, 3, 25, 9, 28, 00).timestamp()
+
         self.market = QGraphicsView(self.market_scene)
         self.market.setObjectName("market")
-        self.market.setRenderHint(QPainter.Antialiasing)
+        #self.market.setRenderHint(QPainter.Antialiasing)
         self.market.setStyleSheet("\
             QWidget#market{background:rgba(255,255,255,0.05)}")
         #aa = self.market(self.market.viewport().geometry()).boundingRect()
@@ -79,4 +87,40 @@ class MainWidget(QWidget):
 
     def resizeEvent(self, event):
         self.market_scene.setSceneRect(0, 0, self.market.width()-2, self.market.height()-2)
-        print(self.market.size())
+        self.market_scene.clear()
+        self.height = self.market_scene.height()
+        self.width = self.market_scene.width()
+
+        self.draw_bg()
+        self.draw_price()
+
+    def draw_bg(self):
+        pen = QPen(QColor(255, 255, 255, 17.75), 1)
+        rect = QGraphicsRectItem(40, -1, self.width - 80, self.height - 20)
+        rect.setPen(pen)
+        self.market_scene.addItem(rect)
+
+
+    def draw_price(self):
+        pen = QPen(QColor(187, 134, 252))
+        path = QPainterPath()
+        for index, row in self.df.iterrows():
+            if index < datetime(2020, 3, 25, 9, 30, 0):
+                continue
+            if index >= datetime(2020, 3, 25, 13, 1, 00):
+                row["time"] = row["time"] - 5400
+            (x, y) = self.to_point(row["time"], row["price"])
+            if index == datetime(2020, 3, 25, 9, 30, 0):
+                path.moveTo(40, y)
+                print(x, y)
+                continue
+            path.lineTo(x, y)
+        self.market_scene.addPath(path, pen)
+
+    def to_point(self, ox, oy):
+        y = (self.max_y - oy) * (self.height - 20) / self.diff_y
+        x = (ox - self.min_x) * (self.width - 80) / self.diff_x + 40
+
+        return (x, y)
+
+
