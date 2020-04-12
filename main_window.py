@@ -15,4 +15,4 @@ class MainWindow(QMainWindow):
         exit_action.triggered.connect(self.close)
         self.file_menu.addAction(exit_action)
 
-        self.setMinimumSize(600, 400)
+        self.setMinimumSize(800, 600)
