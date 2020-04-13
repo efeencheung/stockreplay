@@ -2,10 +2,12 @@ import pandas as pd
 import sqlite3
 
 from datetime import datetime
-from PySide2.QtCore import Qt
+from PySide2.QtCore import Qt, QSizeF
 from PySide2.QtGui import QBrush, QColor, QPalette, QPainter, QPainterPath, QPixmap, QPen
 from PySide2.QtWidgets import QFrame, QGraphicsLineItem, QGraphicsRectItem, QGraphicsScene, QGraphicsView, QHBoxLayout, \
     QLabel, QPushButton, QSizePolicy, QVBoxLayout, QWidget
+
+from cross_line_bg import CrossLineBg
 
 
 class MainWidget(QWidget):
@@ -48,11 +50,9 @@ class MainWidget(QWidget):
         self.top.setFixedHeight(24)
 
         self.market_scene = QGraphicsScene()
-        
         self.market = QGraphicsView(self.market_scene)
         self.market.setObjectName("market")
         self.market.setFrameShape(QFrame.NoFrame)
-        self.market.setRenderHint(QPainter.Antialiasing)
         self.market.setStyleSheet("\
             QWidget#market{background:rgba(255,255,255,0.05)}")
 
@@ -80,20 +80,18 @@ class MainWidget(QWidget):
         self.draw_price()
 
     def draw_bg(self):
+        cross_line_bg = CrossLineBg(QSizeF(self.width - 80, self.height - 20), self.gray_pen)
+        cross_line_bg.setPos(40, 0)
+        self.market_scene.addItem(cross_line_bg)
+        """
         rect = QGraphicsRectItem(40, 0, self.width - 80, self.height - 20)
         rect.setPen(self.gray_pen)
         self.market_scene.addItem(rect)
-        self.market_scene.addLine(40, self.height / 4, self.width - 40, self.height / 4, self.gray_pen)
-        self.market_scene.addLine(40, self.height / 2, self.width - 40, self.height / 2, self.gray_pen)
-        self.market_scene.addLine(40, self.height * 3 / 4, self.width - 40, self.height * 3 / 4, self.gray_pen)
-        self.market_scene.addLine((self.width - 80) / 4 + 40, 0, (self.width - 80) / 4 + 40, self.height - 20, self.gray_pen)
-        self.market_scene.addLine((self.width - 80) / 2 + 40, 0, (self.width - 80) / 2 + 40, self.height - 20, self.gray_pen)
-        self.market_scene.addLine((self.width - 80) * 3 / 4 + 40, 0, (self.width - 80) * 3 / 4 + 40, self.height - 20, self.gray_pen)
+        """
 
     def draw_price(self):
         pen = QPen(QColor(187, 134, 252))
         path = QPainterPath()
-        self.df.to_csv("test.csv")
         for index, row in self.df.iterrows():
             if index < datetime(2020, 3, 25, 9, 30, 0) or \
                     index > datetime(2020, 3, 25, 15, 0, 0) or \
@@ -120,14 +118,8 @@ class MainWidget(QWidget):
             price, volume FROM sz_300315", conn, index_col='time_index')
         self.origin_df.index = pd.to_datetime(self.origin_df.index)
 
-        sec_price = self.origin_df["price"]\
-                .resample('1S', label='right', closed='right').last().fillna(method="pad")
-        sec_volume = self.origin_df["volume"]\
-                .resample('1S', label='right', closed='right').sum()
-        self.sec_df = pd.concat([sec_price, sec_volume], 1) 
-
-        price = self.sec_df["price"].resample('60S', label='right').last()
-        volume = self.sec_df["volume"].resample('60S', label='right').sum()
+        price = self.origin_df["price"].resample('60S', label='right', closed='right').last()
+        volume = self.origin_df["volume"].resample('60S', label='right', closed='right').sum()
         self.df = pd.concat([price, volume], axis=1)
         self.df.to_csv('test.csv')
         max_price = self.df["price"].max()
