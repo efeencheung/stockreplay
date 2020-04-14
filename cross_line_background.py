@@ -2,7 +2,7 @@ from PySide2.QtCore import QRectF
 from PySide2.QtGui import QPainter
 from PySide2.QtWidgets import QGraphicsItem
 
-class CrossLineBg(QGraphicsItem):
+class CrossLineBackground(QGraphicsItem):
     def __init__(self, size, pen):
         QGraphicsItem.__init__(self)
         self.size = size

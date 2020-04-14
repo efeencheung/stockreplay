@@ -7,7 +7,7 @@ from PySide2.QtGui import QBrush, QColor, QPalette, QPainter, QPainterPath, QPix
 from PySide2.QtWidgets import QFrame, QGraphicsLineItem, QGraphicsRectItem, QGraphicsScene, QGraphicsView, QHBoxLayout, \
     QLabel, QPushButton, QSizePolicy, QVBoxLayout, QWidget
 
-from cross_line_bg import CrossLineBg
+from cross_line_background import CrossLineBackground
 
 
 class MainWidget(QWidget):
@@ -80,14 +80,9 @@ class MainWidget(QWidget):
         self.draw_price()
 
     def draw_bg(self):
-        cross_line_bg = CrossLineBg(QSizeF(self.width - 80, self.height - 20), self.gray_pen)
+        cross_line_bg = CrossLineBackground(QSizeF(self.width - 80, \
+                self.height - 20), self.gray_pen)
         cross_line_bg.setPos(40, 0)
-        self.market_scene.addItem(cross_line_bg)
-        """
-        rect = QGraphicsRectItem(40, 0, self.width - 80, self.height - 20)
-        rect.setPen(self.gray_pen)
-        self.market_scene.addItem(rect)
-        """
 
     def draw_price(self):
         pen = QPen(QColor(187, 134, 252))
@@ -121,7 +116,6 @@ class MainWidget(QWidget):
         price = self.origin_df["price"].resample('60S', label='right', closed='right').last()
         volume = self.origin_df["volume"].resample('60S', label='right', closed='right').sum()
         self.df = pd.concat([price, volume], axis=1)
-        self.df.to_csv('test.csv')
         max_price = self.df["price"].max()
         min_price = self.df["price"].min()
         prev_price = 5.39
