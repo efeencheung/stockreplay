@@ -8,6 +8,8 @@ from PySide2.QtWidgets import QFrame, QGraphicsLineItem, QGraphicsRectItem, QGra
     QLabel, QPushButton, QSizePolicy, QVBoxLayout, QWidget
 
 from cross_line_background import CrossLineBackground
+from price_line import PriceLine
+from price_model import PriceModel
 
 
 class MainWidget(QWidget):
@@ -74,64 +76,15 @@ class MainWidget(QWidget):
         self.height = self.market_scene.height()
         self.width = self.market_scene.width()
 
-        self.deal_data()
+        cross_line_background = CrossLineBackground(QSizeF(self.width - 120, \
+                self.height - 120), self.gray_pen)
+        cross_line_background.setPos(60, 0)
 
-        self.draw_bg()
-        self.draw_price()
-
-    def draw_bg(self):
-        cross_line_bg = CrossLineBackground(QSizeF(self.width - 80, \
-                self.height - 20), self.gray_pen)
-        cross_line_bg.setPos(40, 0)
-
-    def draw_price(self):
+        price_model = PriceModel()
         pen = QPen(QColor(187, 134, 252))
-        path = QPainterPath()
-        for index, row in self.df.iterrows():
-            if index < datetime(2020, 3, 25, 9, 30, 0) or \
-                    index > datetime(2020, 3, 25, 15, 0, 0) or \
-                    (index > datetime(2020, 3, 25, 11, 30, 0) and \
-                    index < datetime(2020, 3, 25, 13, 0, 0)):
-                continue
+        price_line = PriceLine(QSizeF(self.width-120, self.height-120), pen, price_model)
+        price_line.setPos(60, 0)
 
-            timestamp = index.timestamp() - 28800
-            if index >= datetime(2020, 3, 25, 13, 0, 0):
-                timestamp = index.timestamp() - 5400 - 28800
-
-            (x, y) = self.to_point(timestamp, row["price"])
-            if index == datetime(2020, 3, 25, 9, 30, 0):
-                path.moveTo(40, y)
-                continue
-
-            path.lineTo(x, y)
-        self.market_scene.addPath(path, pen)
-
-    def deal_data(self):
-        conn = sqlite3.connect('stock.db')        
-        self.origin_df = pd.read_sql_query("\
-            SELECT datetime(time, 'unixepoch', 'localtime') time_index,\
-            price, volume FROM sz_300315", conn, index_col='time_index')
-        self.origin_df.index = pd.to_datetime(self.origin_df.index)
-
-        price = self.origin_df["price"].resample('60S', label='right', closed='right').last()
-        volume = self.origin_df["volume"].resample('60S', label='right', closed='right').sum()
-        self.df = pd.concat([price, volume], axis=1)
-        max_price = self.df["price"].max()
-        min_price = self.df["price"].min()
-        prev_price = 5.39
-        if abs(max_price - prev_price) > abs(min_price - prev_price):
-            self.max_y = prev_price + abs(max_price - prev_price)
-            self.min_y = prev_price - abs(max_price - prev_price)
-        else:
-            self.max_y = prev_price + abs(min_price - prev_price)
-            self.min_y = prev_price - abs(min_price - prev_price)
-        self.diff_x = 14400
-        self.diff_y = self.max_y - self.min_y
-        self.min_x = datetime(2020, 3, 25, 9, 30, 00).timestamp()
-
-    def to_point(self, ox, oy):
-        y = (self.max_y - oy) * (self.height - 20) / self.diff_y
-        x = (ox - self.min_x) * (self.width - 80) / self.diff_x + 40
-
-        return (x, y)
+        self.market_scene.addItem(cross_line_background)
+        self.market_scene.addItem(price_line)
 
