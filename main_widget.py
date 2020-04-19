@@ -24,12 +24,19 @@ class MainWidget(QWidget):
         self.gray_pen = QPen(QColor(255, 255, 255, 17.75), 1)
 
         self.title = QLabel("掌趣科技")
+        self.time_btn = QPushButton("分时", self)
+        self.time_btn.setFixedSize(32, 17)
+        self.time_btn.setCheckable(True)
+        self.time_btn.setChecked(True)
+        self.time_btn.clicked.connect(self.time_line)
         self.tick_btn = QPushButton("逐笔", self)
-        self.tick_btn.setFixedSize(32, 16)
-        self.second_btn = QPushButton("分时", self)
-        self.second_btn.setFixedSize(32, 16)
+        self.tick_btn.setFixedSize(32, 17)
+        self.tick_btn.setCheckable(True)
+        self.tick_btn.clicked.connect(self.tick_line)
         self.k_btn = QPushButton("K线", self)
-        self.k_btn.setFixedSize(32, 16)
+        self.k_btn.setFixedSize(32, 17)
+        self.k_btn.setCheckable(True)
+        self.k_btn.clicked.connect(self.k_line)
         self.top = QWidget(self)
         self.top.setObjectName("top")
         self.top_layout = QHBoxLayout()
@@ -39,17 +46,19 @@ class MainWidget(QWidget):
         self.top.setLayout(self.top_layout)
         self.top.setStyleSheet("\
             QWidget#top{background:rgba(255,255,255,0.05)}\
-            QPushButton{background:rgba(255,255,255,0.16);border:0}\
+            QPushButton{border:0}\
+            QPushButton:checked{background:rgba(255,255,255,0.16);border:0}\
+            QPushButton:hover{background:rgba(255,255,255,0.16);border:0}\
             QPushButton:pressed{background:rgba(255,255,255,0.16)}")
         self.top_layout.addWidget(self.title)
-        self.top_layout.addWidget(self.second_btn)
+        self.top_layout.addWidget(self.time_btn)
         self.top_layout.addWidget(self.tick_btn)
         self.top_layout.addWidget(self.k_btn)
 
         top_size = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         self.top.setSizePolicy(top_size)
-        self.top.setContentsMargins(8, 0, 8, 0)
-        self.top.setFixedHeight(24)
+        self.top.setContentsMargins(8, 4, 8, 4)
+        self.top.setFixedHeight(25)
 
         self.market_scene = QGraphicsScene()
         self.market = QGraphicsView(self.market_scene)
@@ -88,3 +97,17 @@ class MainWidget(QWidget):
         self.market_scene.addItem(cross_line_background)
         self.market_scene.addItem(price_line)
 
+    def time_line(self):
+        self.time_btn.setChecked(True)
+        self.tick_btn.setChecked(False)
+        self.k_btn.setChecked(False)
+        
+    def tick_line(self):
+        self.time_btn.setChecked(False)
+        self.tick_btn.setChecked(True)
+        self.k_btn.setChecked(False)
+        
+    def k_line(self):
+        self.time_btn.setChecked(False)
+        self.tick_btn.setChecked(False)
+        self.k_btn.setChecked(True)
