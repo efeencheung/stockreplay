@@ -25,7 +25,7 @@ class PriceLine(QGraphicsItem):
 
         path = QPainterPath()
         for i in range(len(self.data)):
-            (x, y) = self.to_point(self.data[i][1], self.data[i][0])
+            (x, y) = self.to_point(self.data[i][0], self.data[i][1])
             if i == 0:
                 path.moveTo(0, y)
                 continue

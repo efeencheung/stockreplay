@@ -29,16 +29,19 @@ class PriceModel():
         self.min_x = datetime(self.year, self.month, self.day, 9, 30, 00).timestamp()
         self.max_x = self.min_x + 14400
     
-        time_price = self.origin_df["price"].resample('60S', label='right', closed='right').last().fillna(method='pad')
-        time_volume = self.origin_df["volume"].resample('60S', label='right', closed='right').sum()
-        time_df = pd.concat([time_price, time_volume], axis=1)
         self.time_data = self.data_deal('60S')
         self.tick_data = self.data_deal('1S')
 
     def data_deal(self, time_interval):
         price = self.origin_df["price"].resample(time_interval, label='right', closed='right').last().fillna(method='pad')
         volume = self.origin_df["volume"].resample(time_interval, label='right', closed='right').sum()
-        df = pd.concat([price, volume], axis=1)
+        opening_price = self.origin_df["price"].resample(time_interval, label='right', closed='right').first()
+        closing_price = self.origin_df["price"].resample(time_interval, label='right', closed='right').last()
+        max_price = self.origin_df["price"].resample(time_interval, label='right', closed='right').max()
+        min_price = self.origin_df["price"].resample(time_interval, label='right', closed='right').min()
+        df = pd.concat([price, volume, opening_price, closing_price, max_price, min_price], \
+            keys=['price', 'volume', 'opening_price', 'closing_price', 'max_price', 'min_price'], \
+            axis=1)
         data = []
         for index, row in df.iterrows():
             if index < datetime(self.year, self.month, self.day, 9, 30, 0) or \
@@ -51,7 +54,8 @@ class PriceModel():
             if index >= datetime(self.year, self.month, self.day, 13, 0, 0):
                 timestamp = index.timestamp() - 5400 - 28800
 
-            data.append((row["price"], timestamp))
+            data.append((timestamp, row["price"], row["volume"], row["opening_price"], \
+                    row["closing_price"], row["max_price"], row["min_price"]))
 
         return data
     
