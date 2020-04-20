@@ -9,7 +9,6 @@ from PySide2.QtWidgets import QFrame, QGraphicsLineItem, QGraphicsRectItem, QGra
 
 from cross_line_background import CrossLineBackground
 from price_line import PriceLine
-from price_model import PriceModel
 
 
 class MainWidget(QWidget):
@@ -21,6 +20,7 @@ class MainWidget(QWidget):
         palette.setColor(QPalette.Background, QColor(18, 18, 18))
         palette.setColor(QPalette.Foreground, QColor(226, 226, 226))
 
+        self.data_type = 'time'
         self.gray_pen = QPen(QColor(255, 255, 255, 17.75), 1)
 
         self.title = QLabel("掌趣科技")
@@ -80,18 +80,20 @@ class MainWidget(QWidget):
 
     def resizeEvent(self, event):
         self.market_scene.setSceneRect(0, 0, self.market.width(), self.market.height())
-        self.market_scene.clear()
-        self.market_scene.addLine(0, 0, self.market.width(), 0, self.gray_pen)
         self.height = self.market_scene.height()
         self.width = self.market_scene.width()
+        self.redraw()
+
+    def redraw(self):
+        self.market_scene.clear()
+        self.market_scene.addLine(0, 0, self.market.width(), 0, self.gray_pen)
 
         cross_line_background = CrossLineBackground(QSizeF(self.width - 120, \
-                self.height - 120), self.gray_pen)
+                self.height - 320), self.gray_pen)
         cross_line_background.setPos(60, 0)
 
-        price_model = PriceModel()
         pen = QPen(QColor(187, 134, 252))
-        price_line = PriceLine(QSizeF(self.width-120, self.height-120), pen, price_model)
+        price_line = PriceLine(QSizeF(self.width-120, self.height-320), pen, self.data_type)
         price_line.setPos(60, 0)
 
         self.market_scene.addItem(cross_line_background)
@@ -101,11 +103,15 @@ class MainWidget(QWidget):
         self.time_btn.setChecked(True)
         self.tick_btn.setChecked(False)
         self.k_btn.setChecked(False)
+        self.data_type = 'time'
+        self.redraw()
         
     def tick_line(self):
         self.time_btn.setChecked(False)
         self.tick_btn.setChecked(True)
         self.k_btn.setChecked(False)
+        self.data_type = 'tick'
+        self.redraw()
         
     def k_line(self):
         self.time_btn.setChecked(False)

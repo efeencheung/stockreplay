@@ -11,16 +11,13 @@ class PriceModel():
         self.load()
 
     def load(self):
-        origin_df = pd.read_sql_query("\
+        self.origin_df = pd.read_sql_query("\
             SELECT datetime(time, 'unixepoch', 'localtime') time_index,\
             price, volume FROM sz_300315", self.conn, index_col='time_index')
-        origin_df.index = pd.to_datetime(origin_df.index)
-        date_str = date(self.year, self.month, self.day).isoformat()
-        price = origin_df["price"].resample('60S', label='right', closed='right').last().fillna(method='pad')
-        volume = origin_df["volume"].resample('60S', label='right', closed='right').sum()
-        df = pd.concat([price, volume], axis=1)
-        max_price = df["price"].max()
-        min_price = df["price"].min()
+        self.origin_df.index = pd.to_datetime(self.origin_df.index)
+
+        max_price = self.origin_df["price"].max()
+        min_price = self.origin_df["price"].min()
         if abs(max_price - self.yestoday_closing_price) > abs(min_price - self.yestoday_closing_price):
             self.max_y = self.yestoday_closing_price + abs(max_price - self.yestoday_closing_price)
             self.min_y = self.yestoday_closing_price - abs(max_price - self.yestoday_closing_price)
@@ -31,7 +28,18 @@ class PriceModel():
         self.diff_y = self.max_y - self.min_y
         self.min_x = datetime(self.year, self.month, self.day, 9, 30, 00).timestamp()
         self.max_x = self.min_x + 14400
-        self.data = []
+    
+        time_price = self.origin_df["price"].resample('60S', label='right', closed='right').last().fillna(method='pad')
+        time_volume = self.origin_df["volume"].resample('60S', label='right', closed='right').sum()
+        time_df = pd.concat([time_price, time_volume], axis=1)
+        self.time_data = self.data_deal('60S')
+        self.tick_data = self.data_deal('1S')
+
+    def data_deal(self, time_interval):
+        price = self.origin_df["price"].resample(time_interval, label='right', closed='right').last().fillna(method='pad')
+        volume = self.origin_df["volume"].resample(time_interval, label='right', closed='right').sum()
+        df = pd.concat([price, volume], axis=1)
+        data = []
         for index, row in df.iterrows():
             if index < datetime(self.year, self.month, self.day, 9, 30, 0) or \
                     index > datetime(self.year, self.month, self.day, 15, 0, 0) or \
@@ -43,5 +51,7 @@ class PriceModel():
             if index >= datetime(self.year, self.month, self.day, 13, 0, 0):
                 timestamp = index.timestamp() - 5400 - 28800
 
-            self.data.append((row["price"], timestamp))
+            data.append((row["price"], timestamp))
 
+        return data
+    
