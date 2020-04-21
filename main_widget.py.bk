@@ -6,9 +6,9 @@ from PySide2.QtCore import Qt, QSizeF
 from PySide2.QtGui import QBrush, QColor, QPalette, QPainter, QPainterPath, QPixmap, QPen
 from PySide2.QtWidgets import QFrame, QGraphicsLineItem, QGraphicsRectItem, QGraphicsScene, QGraphicsView, QHBoxLayout, \
     QLabel, QPushButton, QSizePolicy, QVBoxLayout, QWidget
-from PySide2.QtCharts import QtCharts
 
-from price_model import PriceModel
+from cross_line_background import CrossLineBackground
+from price_line import PriceLine
 
 
 class MainWidget(QWidget):
@@ -60,22 +60,18 @@ class MainWidget(QWidget):
         self.top.setContentsMargins(8, 4, 8, 4)
         self.top.setFixedHeight(25)
 
-        self.chart = QtCharts.QChart()
-        self.chart.setAnimationOptions(QtCharts.QChart.AllAnimations)
-        self.chart_view = QtCharts.QChartView(self.chart)
-        self.chart_view.setRenderHint(QPainter.Antialiasing)
-
-        self.series = QtCharts.QLineSeries()
-        price_model = PriceModel()
-        for i in range(len(price_model.tick_data)):
-            self.series.append(price_model.tick_data[i][0], price_model.tick_data[i][1])
-        self.chart.addSeries(self.series)
+        self.market_scene = QGraphicsScene()
+        self.market = QGraphicsView(self.market_scene)
+        self.market.setObjectName("market")
+        self.market.setFrameShape(QFrame.NoFrame)
+        self.market.setStyleSheet("\
+            QWidget#market{background:rgba(255,255,255,0.05)}")
 
         self.main_layout = QVBoxLayout()
         self.main_layout.setMargin(0)
         self.main_layout.setSpacing(0)
         self.main_layout.addWidget(self.top)
-        self.main_layout.addWidget(self.chart_view)
+        self.main_layout.addWidget(self.market)
         self.setLayout(self.main_layout)
         self.setPalette(palette)
         self.setAutoFillBackground(True)
@@ -83,8 +79,25 @@ class MainWidget(QWidget):
         self.setSizePolicy(size)
 
     def resizeEvent(self, event):
-        self.chart_view.scene().setSceneRect(0, 0, self.chart_view.width(), self.chart_view.height())
-        print(self.chart_view.scene().width())
+        self.market_scene.setSceneRect(0, 0, self.market.width(), self.market.height())
+        self.height = self.market_scene.height()
+        self.width = self.market_scene.width()
+        self.redraw()
+
+    def redraw(self):
+        self.market_scene.clear()
+        self.market_scene.addLine(0, 0, self.market.width(), 0, self.gray_pen)
+
+        cross_line_background = CrossLineBackground(QSizeF(self.width - 120, \
+                self.height - 320), self.gray_pen)
+        cross_line_background.setPos(60, 0)
+
+        pen = QPen(QColor(187, 134, 252))
+        price_line = PriceLine(QSizeF(self.width-120, self.height-320), pen, self.data_type)
+        price_line.setPos(60, 0)
+
+        self.market_scene.addItem(cross_line_background)
+        self.market_scene.addItem(price_line)
 
     def time_line(self):
         self.time_btn.setChecked(True)
