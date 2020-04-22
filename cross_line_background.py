@@ -7,6 +7,7 @@ class CrossLineBackground(QGraphicsItem):
         QGraphicsItem.__init__(self)
         self.size = size
         self.pen = pen
+        self.pen.setCosmetic(True)
 
     def boundingRect(self):
         return QRectF(0, 0, self.size.width(), self.size.height())

@@ -9,6 +9,7 @@ class PriceLine(QGraphicsItem):
         QGraphicsItem.__init__(self)
         self.size = size
         self.pen = pen
+        self.pen.setCosmetic(True)
         self.price_model = PriceModel()
         if data_type == 'time':
             self.data = self.price_model.time_data
