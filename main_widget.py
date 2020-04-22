@@ -89,9 +89,12 @@ class MainWidget(QWidget):
     def resizeEvent(self, event):
         self.market_scene.setSceneRect(0, 0, self.market.width(), self.market.height())
         transform = QTransform((event.size().width()-120)/680, 0, 0, event.size().height()/575, 0, 0)
-        self.time_price_line.setTransform(transform)
-        self.tick_price_line.setTransform(transform)
-        self.cross_line_background.setTransform(transform)
+        if hasattr(self, 'time_price_line'):
+            self.time_price_line.setTransform(transform)
+        if hasattr(self, 'tick_price_line'):
+            self.tick_price_line.setTransform(transform)
+        if hasattr(self, 'cross_line_background'):
+            self.cross_line_background.setTransform(transform)
 
     def draw(self):
         self.market_scene.clear()
@@ -104,13 +107,9 @@ class MainWidget(QWidget):
         pen = QPen(QColor(187, 134, 252))
         self.time_price_line = PriceLine(QSizeF(self.width-120, self.height-320), pen, 'time')
         self.time_price_line.setPos(60, 0)
-        self.tick_price_line = PriceLine(QSizeF(self.width-120, self.height-320), pen, 'tick')
-        self.tick_price_line.setPos(60, 0)
-        self.tick_price_line.setVisible(False)
 
         self.market_scene.addItem(self.cross_line_background)
         self.market_scene.addItem(self.time_price_line)
-        self.market_scene.addItem(self.tick_price_line)
 
     def time_line(self):
         self.time_btn.setChecked(True)
@@ -123,9 +122,16 @@ class MainWidget(QWidget):
         self.time_btn.setChecked(False)
         self.tick_btn.setChecked(True)
         self.k_btn.setChecked(False)
-        self.tick_price_line.setVisible(True)
+
         self.time_price_line.setVisible(False)
-        
+        if hasattr(self, 'tick_price_line'):
+            self.tick_price_line.setVisible(True)
+        else:
+            pen = QPen(QColor(187, 134, 252))
+            self.tick_price_line = PriceLine(QSizeF(self.width-120, self.height-320), pen, 'tick')
+            self.tick_price_line.setPos(60, 0)
+            self.market_scene.addItem(self.tick_price_line)
+
     def k_line(self):
         self.time_btn.setChecked(False)
         self.tick_btn.setChecked(False)
