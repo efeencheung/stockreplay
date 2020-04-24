@@ -13,7 +13,7 @@ class PriceModel():
     def load(self):
         self.origin_df = pd.read_sql_query("\
             SELECT datetime(time, 'unixepoch', 'localtime') time_index,\
-            price, volume FROM sz_300315", self.conn, index_col='time_index')
+            price, volume FROM tick_l1", self.conn, index_col='time_index')
         self.origin_df.index = pd.to_datetime(self.origin_df.index)
 
         max_price = self.origin_df["price"].max()
