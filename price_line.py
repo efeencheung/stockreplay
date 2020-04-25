@@ -5,16 +5,13 @@ from price_model import PriceModel
 
 
 class PriceLine(QGraphicsItem):
-    def __init__(self, size, pen, data_type='time'):
+    def __init__(self, size, pen):
         QGraphicsItem.__init__(self)
         self.size = size
         self.pen = pen
         self.pen.setCosmetic(True)
         self.price_model = PriceModel()
-        if data_type == 'time':
-            self.data = self.price_model.time_data
-        else:
-            self.data = self.price_model.tick_data
+        self.data = self.price_model.data
 
     def boundingRect(self):
         return QRectF(0, 0, self.size.width(), self.size.height())
