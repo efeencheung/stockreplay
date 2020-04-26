@@ -60,18 +60,18 @@ class MainWidget(QWidget):
         size = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         self.setSizePolicy(size)
 
-
     def resizeEvent(self, event):
         self.market_scene.setSceneRect(0, 0, self.market.width(), self.market.height())
         self.height = self.market.height()
         self.width = self.market.width()
+        self.draw()
         if self.timer_id:
             self.killTimer(self.timer_id)
             self.timer_id = 0
         self.timer_id = self.startTimer(100)
 
-    def timerEvent(self, event):
-        self.draw()
+    #def timerEvent(self, event):
+        #self.draw()
 
     def draw(self):
         price_model = PriceModel()
@@ -80,15 +80,16 @@ class MainWidget(QWidget):
         self.market_scene.addLine(self.width-60, 0, self.width, 0, self.gray_pen)
 
         self.cross_line_background = CrossLineBackground(QSizeF(self.width-120, \
-                self.height-320), self.gray_pen)
+                self.height*3/5), self.gray_pen)
         self.cross_line_background.setPos(60, 0)
 
         pen = QPen(QColor(187, 134, 252))
-        self.price_line = PriceLine(QSizeF(self.width-120, self.height-320), pen)
+        self.price_line = PriceLine(QSizeF(self.width-120, self.height*3/5), pen)
         self.price_line.setPos(60, 0)
 
-        self.left_yaxis = PriceYaxis(QSizeF(self.width, self.height-320), price_model)
+        self.left_yaxis = PriceYaxis(QSizeF(self.width, self.height*3/5), price_model)
 
         self.market_scene.addItem(self.cross_line_background)
         self.market_scene.addItem(self.price_line)
         self.market_scene.addItem(self.left_yaxis)
+

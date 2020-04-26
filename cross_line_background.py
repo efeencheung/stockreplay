@@ -28,3 +28,5 @@ class CrossLineBackground(QGraphicsItem):
                 self.size.height())
         painter.drawLine((self.size.width()) * 3 / 4, 0, self.size.width() * 3 / 4, \
                 self.size.height())
+        print('ssss')
+

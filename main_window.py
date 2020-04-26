@@ -15,4 +15,10 @@ class MainWindow(QMainWindow):
         exit_action.triggered.connect(self.close)
         self.file_menu.addAction(exit_action)
 
-        self.setMinimumSize(800, 600)
+        self.setMinimumSize(800, 450)
+        self.setMouseTracking(True)
+        self.centralWidget().setMouseTracking(True)
+
+    def mouseMoveEvent(self, event):
+        print(event.pos())
+
