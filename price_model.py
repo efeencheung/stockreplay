@@ -13,16 +13,15 @@ class PriceModel():
         cursor.execute('SELECT MAX(price) high, MIN(price) low FROM tick_l1')
         (high, low) = cursor.fetchone()
         if abs(high - self.yestoday_close) > abs(low - self.yestoday_close):
-            self.max_y = self.yestoday_close + abs(high - self.yestoday_close)
-            self.min_y = self.yestoday_close - abs(high - self.yestoday_close)
+            self.max_y = round(self.yestoday_close+abs(high-self.yestoday_close), 2)
+            self.min_y = round(self.yestoday_close-abs(high-self.yestoday_close), 2)
         else:
-            self.max_y = self.yestoday_close + abs(low - self.yestoday_close)
-            self.min_y = self.yestoday_close - abs(low - self.yestoday_close)
+            self.max_y = round(self.yestoday_close+abs(low-self.yestoday_close), 2)
+            self.min_y = round(self.yestoday_close-abs(low-self.yestoday_close), 2)
         self.diff_x = 14400
         self.diff_y = self.max_y - self.min_y
         self.min_x = datetime(self.year, self.month, self.day, 9, 30, 00).timestamp()
         self.max_x = self.min_x + 14400
-        print(high, low)
 
         self.df = pd.read_sql_query("SELECT time, price FROM data_1m", conn)
         self.data = []
