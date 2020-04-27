@@ -11,6 +11,7 @@ from cross_line_background import CrossLineBackground
 from price_line import PriceLine
 from price_model import PriceModel
 from price_yaxis import PriceYaxis
+from main_view import MainView
 
 
 class MainWidget(QWidget):
@@ -42,7 +43,7 @@ class MainWidget(QWidget):
         self.top.setFixedHeight(21)
 
         self.market_scene = QGraphicsScene()
-        self.market = QGraphicsView(self.market_scene)
+        self.market = MainView(self.market_scene)
         self.market.setAlignment(Qt.AlignTop)
         self.market.setObjectName("market")
         self.market.setFrameShape(QFrame.NoFrame)
@@ -54,6 +55,7 @@ class MainWidget(QWidget):
         self.main_layout.setSpacing(0)
         self.main_layout.addWidget(self.top)
         self.main_layout.addWidget(self.market)
+        self.market.setMouseTracking(True)
         self.setLayout(self.main_layout)
         self.setPalette(palette)
         self.setAutoFillBackground(True)
@@ -92,4 +94,4 @@ class MainWidget(QWidget):
         self.market_scene.addItem(self.cross_line_background)
         self.market_scene.addItem(self.price_line)
         self.market_scene.addItem(self.left_yaxis)
-
+        self.cross_line_background.grabMouse()
