@@ -17,15 +17,14 @@ class CrossLineBackground(QGraphicsItem):
         painter.setRenderHint(QPainter.SmoothPixmapTransform)
         painter.drawRect(0, 0, self.size.width(), self.size.height())
         painter.drawLine(0, self.size.height() / 4, self.size.width(), \
-                self.size.height() / 4)
+            self.size.height() / 4)
         painter.drawLine(0, self.size.height() / 2, self.size.width(), \
-                self.size.height() / 2)
+            self.size.height() / 2)
         painter.drawLine(0, self.size.height() * 3 / 4, self.size.width(), \
-                self.size.height() * 3 / 4)
+            self.size.height() * 3 / 4)
         painter.drawLine((self.size.width()) / 4, 0, self.size.width() / 4, \
-                self.size.height())
+            self.size.height())
         painter.drawLine((self.size.width()) / 2, 0, self.size.width() / 2, \
-                self.size.height())
+            self.size.height())
         painter.drawLine((self.size.width()) * 3 / 4, 0, self.size.width() * 3 / 4, \
-                self.size.height())
-        print('ssss')
+            self.size.height())

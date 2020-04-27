@@ -1,16 +1,14 @@
 from PySide2.QtCore import QRectF
 from PySide2.QtGui import QPainter, QPainterPath
 from PySide2.QtWidgets import QGraphicsItem
-from price_model import PriceModel
 
 
 class PriceLine(QGraphicsItem):
-    def __init__(self, size, pen):
+    def __init__(self, size, pen, price_model):
         QGraphicsItem.__init__(self)
         self.size = size
         self.pen = pen
-        self.pen.setCosmetic(True)
-        self.price_model = PriceModel()
+        self.price_model = price_model
         self.data = self.price_model.data
 
     def boundingRect(self):
