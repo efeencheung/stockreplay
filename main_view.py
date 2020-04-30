@@ -3,7 +3,7 @@ from PySide2.QtGui import QColor, QPen
 from PySide2.QtWidgets import QGraphicsLineItem, QGraphicsTextItem, QGraphicsView
 
 from cross_line_background import CrossLineBackground
-from pos_line import PosLine
+from pos_text import PosText
 from price_line import PriceLine
 from price_model import PriceModel
 from price_yaxis import PriceYaxis
@@ -25,9 +25,12 @@ class MainView(QGraphicsView):
             self.pos_v_line.setVisible(True)
             self.pos_h_line.setY(y)
             self.pos_v_line.setX(x)
+            self.price.setVisible(True)
+            self.price.setY(y-7)
         else: 
             self.pos_h_line.setVisible(False)
             self.pos_v_line.setVisible(False)
+            self.price.setVisible(False)
 
     def resizeEvent(self, event):
         self.scene.setSceneRect(0, 0, self.width(), self.height())
@@ -41,7 +44,7 @@ class MainView(QGraphicsView):
         #self.draw()
 
     def draw(self):
-        price_model = PriceModel()
+        self.price_model = PriceModel()
         self.scene.clear()
         self.scene.addLine(0, 0, self.padding_h, 0, self.gray_pen)
         self.scene.addLine(self.width()-self.padding_h, \
@@ -56,7 +59,7 @@ class MainView(QGraphicsView):
             self.height()*3/5), self.gray_pen)
         self.cross_line_background.setPos(60, 0)
 
-        pen = QPen(QColor(187, 134, 252))
+        pen = QPen(QColor(33, 150, 243))
         self.price_line = PriceLine(\
             QSizeF(self.width()-self.padding_h*2, \
             self.height()*3/5), pen, price_model)
@@ -75,10 +78,14 @@ class MainView(QGraphicsView):
         self.pos_h_line.setVisible(False)
         self.pos_v_line.setVisible(False)
 
-        self.price = QGraphicsTextItem()
+        self.price = PosText(QSizeF(self.padding_h-2, 14), \
+            str(price_model.yestoday_close), Qt.AlignRight)
+        self.price.setPos(1, self.height()*3/10-7.5)
+        self.price.setVisible(False)
 
         self.scene.addItem(self.cross_line_background)
         self.scene.addItem(self.pos_h_line)
         self.scene.addItem(self.pos_v_line)
         self.scene.addItem(self.price_line)
         self.scene.addItem(self.left_yaxis)
+        self.scene.addItem(self.price)
