@@ -17,9 +17,9 @@ class PosText(QGraphicsItem):
         pen = QPen(QColor(33, 150, 243))
         painter.setPen(pen)
         painter.drawRect(self.boundingRect())
-        painter.fillRect(QRectF(1, 1, self.size.width()-2, self.size.height()-2), QBrush(QColor(29, 29, 29)))
-        painter.drawText(0, 0, self.size.width()-4, \
+        painter.fillRect(QRectF(1, 1, self.size.width()-1, self.size.height()-1), QBrush(Qt.white))
+        painter.drawText(3, 0, self.size.width()-6, \
             self.size.height(), self.align, self.text)
 
-    def set_text(text):
+    def set_text(self, text):
         self.text = text

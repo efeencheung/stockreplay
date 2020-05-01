@@ -1,16 +1,16 @@
 import sys
 
 from main_window import MainWindow
-from main_widget import MainWidget
-from PySide2.QtWidgets import QApplication
+from main_view import MainView
+from PySide2.QtWidgets import QApplication, QGraphicsScene
 
 if __name__ == "__main__":
     app = QApplication([])
-    app.setStyleSheet("QWidget{font-size: 12px; color: rgb(226, 226, 226)}")
-    #app.setStyleSheet("QPushButton{background-color: rgba(18, 18, 18, 0.16)}")
+    #app.setStyleSheet("QWidget{font-size: 12px; color: rgb(226, 226, 226)}")
 
-    widget = MainWidget()
-    window = MainWindow(widget)
+    scene = QGraphicsScene()
+    view = MainView(scene)
+    window = MainWindow(view)
     window.show()
 
     sys.exit(app.exec_())

@@ -17,7 +17,7 @@ class PriceYaxis(QGraphicsItem):
 
     def paint(self, painter, option, widget):
         red_pen = QPen(QColor(255, 23, 24))
-        gray_pen = QPen(QColor(189, 189, 189))
+        gray_pen = QPen(QColor(117, 117, 117))
         green_pen = QPen(QColor(25, 183, 83))
 
         ly1 = self.price_model.max_y

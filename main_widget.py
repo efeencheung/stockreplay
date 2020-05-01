@@ -14,10 +14,6 @@ class MainWidget(QWidget):
     def __init__(self):
         QWidget.__init__(self)
 
-        palette = QPalette()
-        palette.setColor(QPalette.Background, QColor(18, 18, 18))
-        palette.setColor(QPalette.Foreground, QColor(226, 226, 226))
-
         self.title = QLabel("掌趣科技")
         self.top = QWidget(self)
         self.top.setObjectName("top")
@@ -39,8 +35,6 @@ class MainWidget(QWidget):
         self.market.setAlignment(Qt.AlignTop)
         self.market.setObjectName("market")
         self.market.setFrameShape(QFrame.NoFrame)
-        self.market.setStyleSheet("\
-            QWidget#market{background:rgba(255,255,255,0.05)}")
 
         self.main_layout = QVBoxLayout()
         self.main_layout.setMargin(0)
@@ -49,7 +43,6 @@ class MainWidget(QWidget):
         self.main_layout.addWidget(self.market)
         self.market.setMouseTracking(True)
         self.setLayout(self.main_layout)
-        self.setPalette(palette)
         self.setAutoFillBackground(True)
         size = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         self.setSizePolicy(size)
