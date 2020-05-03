@@ -1,5 +1,5 @@
 from PySide2.QtCore import QRectF, Qt
-from PySide2.QtGui import QColor, QPainter, QPainterPath, QPen
+from PySide2.QtGui import QColor, QPainter, QPen
 from PySide2.QtWidgets import QGraphicsItem
 from price_model import PriceModel
 
@@ -13,7 +13,6 @@ class PriceYaxis(QGraphicsItem):
 
     def boundingRect(self):
         return QRectF(0, 0, self.size.width(), self.size.height())
-    
 
     def paint(self, painter, option, widget):
         red_pen = QPen(QColor(255, 23, 24))
@@ -44,18 +43,24 @@ class PriceYaxis(QGraphicsItem):
         painter.drawText(ly4_rect, Qt.AlignRight, str(ly4))
         painter.drawText(ly5_rect, Qt.AlignRight, str(ly5))
 
-        max_percent = round((self.price_model.max_y-self.price_model.yestoday_close)/self.price_model.yestoday_close*100, 2)
+        max_percent = round((self.price_model.max_y -
+                             self.price_model.yestoday_close
+                             ) / self.price_model.yestoday_close * 100, 2)
         ry1 = str(max_percent) + '%'
         ry2 = str(round(max_percent/2, 2)) + '%'
         ry3 = '0.00%'
         ry4 = '-' + ry2
         ry5 = '-' + ry1
 
-        ry1_rect = QRectF(self.size.width()-56, 0, 56, 15)
-        ry2_rect = QRectF(self.size.width()-56, self.size.height()/4-7.5, 56, 15)
-        ry3_rect = QRectF(self.size.width()-56, self.size.height()/2-7.5, 56, 15)
-        ry4_rect = QRectF(self.size.width()-56, self.size.height()*3/4-7.5, 56, 15)
-        ry5_rect = QRectF(self.size.width()-56, self.size.height()-15, 56, 15)
+        ry1_rect = QRectF(self.size.width() - 56, 0, 56, 15)
+        ry2_rect = QRectF(self.size.width() - 56, self.size.height() /
+                          4 - 7.5, 56, 15)
+        ry3_rect = QRectF(self.size.width() - 56, self.size.height() /
+                          2 - 7.5, 56, 15)
+        ry4_rect = QRectF(self.size.width() - 56, self.size.height() * 3 / 4 -
+                          7.5, 56, 15)
+        ry5_rect = QRectF(self.size.width() - 56, self.size.height() - 15,
+                          56, 15)
 
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setPen(red_pen)

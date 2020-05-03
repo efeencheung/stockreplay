@@ -13,7 +13,6 @@ class PriceLine(QGraphicsItem):
 
     def boundingRect(self):
         return QRectF(0, 0, self.size.width(), self.size.height())
-    
 
     def paint(self, painter, option, widget):
         painter.setPen(self.pen)
@@ -30,7 +29,9 @@ class PriceLine(QGraphicsItem):
         painter.drawPath(path)
 
     def to_point(self, ox, oy):
-        y = (self.price_model.max_y - oy) * self.size.height() / self.price_model.diff_y
-        x = (ox - self.price_model.min_x) * self.size.width() / self.price_model.diff_x
+        y = (self.price_model.max_y - oy) * self.size.height() /\
+            self.price_model.diff_y
+        x = (ox - self.price_model.min_x) * self.size.width() /\
+            self.price_model.diff_x
 
         return (x, y)
