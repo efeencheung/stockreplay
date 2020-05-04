@@ -24,7 +24,6 @@ class VolumeBar(QGraphicsItem):
         green_brush = QBrush(QColor(25, 183, 83))
 
         width = (self.size.width() - 241) / 242
-        print(width)
         for i in range(len(self.data)):
             if self.data[i][2] == "long":
                 painter.setPen(red_pen)
