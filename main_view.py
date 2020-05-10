@@ -22,6 +22,7 @@ class MainView(QGraphicsView):
         self.gray_pen = QPen(QColor(224, 224, 224), 1)
         self.timer_id = 0
         self.price_model = PriceModel()
+        self.secondary_num = 1
 
     def mouseMoveEvent(self, event):
         x = event.pos().x()
@@ -51,12 +52,9 @@ class MainView(QGraphicsView):
                 rov = "{:.2f}%".format(rov)
                 self.price.set_text(price)
                 self.rov.set_text(rov)
-            if y > self.price_area_height + self.title_h * 2 \
-               and y < self.height() - self.title_h:
-                vol = int(self.price_model.max_vol - (y - self.title_h * 2 -
-                          self.price_area_height) / (self.height() -
-                          self.price_area_height - self.title_h * 3) *
-                          self.price_model.max_vol)
+            if y > self.vol.y() and y < self.vol.y() + self.vol.size.height():
+                vol = int(self.price_model.max_vol - (y - self.vol.y()) /
+                          self.vol.size.height() * self.price_model.max_vol)
                 self.vol_l.setVisible(True)
                 self.vol_r.setVisible(True)
                 self.vol_l.setY(y-7)
@@ -74,6 +72,8 @@ class MainView(QGraphicsView):
     def resizeEvent(self, event):
         self.scene.setSceneRect(0, 0, self.width(), self.height())
         self.price_area_height = (self.height() - self.title_h) * 3 / 5
+        self.secondary_area_h = self.height() - self.price_area_height - \
+            self.title_h * (self.secondary_num + 2)
         self.draw()
         if self.timer_id:
             self.killTimer(self.timer_id)
@@ -111,10 +111,10 @@ class MainView(QGraphicsView):
 
         # 画价格曲线
         pen = QPen(QColor(33, 150, 243))
-        self.price_line = PriceLine(QSizeF(self.width() - self.padding_h*2 - 2,
+        self.price_area = PriceLine(QSizeF(self.width() - self.padding_h*2 - 2,
                                     self.price_area_height), pen,
                                     self.price_model)
-        self.price_line.setPos(self.padding_h + 1, self.title_h)
+        self.price_area.setPos(self.padding_h + 1, self.title_h)
 
         # 画价格区域左右Y轴
         self.price_yaxis = PriceYaxis(QSizeF(self.width(),
@@ -185,7 +185,7 @@ class MainView(QGraphicsView):
         self.second_yaxis.setPos(0, self.title_h * 2 + self.price_area_height)
 
         self.scene.addItem(self.price_area_background)
-        self.scene.addItem(self.price_line)
+        self.scene.addItem(self.price_area)
         self.scene.addItem(self.price_yaxis)
         self.scene.addItem(self.second_area_background)
         self.scene.addItem(self.vol)
