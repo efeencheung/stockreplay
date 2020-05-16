@@ -2,8 +2,12 @@ from PySide2.QtCore import QRectF
 
 
 class PlotArea:
-    def __init__(self, size):
+    def __init__(self, size, type=2):
         self.size = size
+        self.serieses = []
+
+    def add_series(self, series):
+        self.serieses.append(series)
 
     def set_bg(self, background):
         self.background = background
