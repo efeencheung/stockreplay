@@ -30,8 +30,8 @@ class PriceModel():
                               9, 30, 00).timestamp()
         self.max_x = self.min_x + 14400
 
-        self.df = pd.read_sql_query("SELECT time, price, volume, open, close\
-                                    FROM data_1m", conn)
+        self.df = pd.read_sql_query("SELECT time, price, volume, average,\
+                                    direction FROM data_1m", conn)
         self.max_vol = self.df["volume"].max()
         self.data = []
         self.vol_data = []
